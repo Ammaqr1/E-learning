@@ -355,12 +355,12 @@ elif st.session_state.page == 'more':
     if current_question < len(questions):
         question = questions[current_question]
         if current_question == 0 or db.get_message_history(user_id, f"profile_evaluation_{user_id}")[-1]['content'] != question:
-            db.save_message(user_id, f"profile_evaluation_{user_id}", "assistant", question)
+            db.save_message(user_id, f'evaluation_question_{user_id}', "assistant", question)
         st.write(question)
         answer = st.text_input("Your answer")
         
         if st.button("Submit Answer", key=f'evaluation_submit_{current_question}'):
-            db.save_message(user_id, f"profile_evaluation_{user_id}", "user", answer)
+            db.save_message(user_id, f'evaluation_question_{user_id}', "user", answer)
             st.session_state.current_questions += 1
             if st.session_state.current_questions == len(questions):
                 navigate('dashboard')
