@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 class QuestionGenerator16:
     def __init__(self, user_id):
         # Initialize the database connection with default parameters
-        self.db = PostgresDatabase(dbname='new_db_name', user='postgres', password='ammar')
+        self.db = PostgresDatabase()
         self.db.connect()
         self.user_id = user_id
         

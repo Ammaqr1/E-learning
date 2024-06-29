@@ -1,11 +1,11 @@
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_google_genai import GoogleGenerativeAI, HarmBlockThreshold, HarmCategory
-from database2 import PostgresDatabase  # Replace with actual import for your database
+from database2 import PostgresDatabase
 
 class QAsummary:
     def __init__(self, user_id,conversational_id):
         # Initialize the database connection with default parameters
-        self.db = PostgresDatabase(dbname='new_db_name', user='postgres', password='ammar')
+        self.db = PostgresDatabase()
         self.db.connect()
         self.user_id = user_id
         self.conversational_id = conversational_id
@@ -14,8 +14,9 @@ class QAsummary:
         self.instruction_to_system = '''
         
         You are an execcellent physics tutor After analyzing the all the questions and answers from the history, come up with a summary of the student's performance. 
-        Describe their weaknesses and provide the best solutions to address these weaknesses.After give some best free resourcess to overcome those mentioned weakness
-        Provide the summary in the following structure: Note: Minimum five question and answer are needed for evaluation else: say: No enough data to evaluate
+        Describe their weaknesses and provide the best solutions to address these weaknesses.After give some best free resourcess to overcome those mentioned weakness,Also note that 
+        Do not give description if the history of humman messages are less than two:
+        Provide the summary in the following structure: 
         
 
         Summary: 
@@ -42,13 +43,14 @@ class QAsummary:
     def fetch_questions(self):
         # Fetch message history based on user_id from the database
         chat_history = self.db.get_message_history(self.user_id, self.conversational_id)
+        print(chat_history)
         
         # print('chat history',chat_history)
 
         # Format the prompt template with chat history
         formatted_messages = self.question_make_prompt.format_messages(
             chat_history=chat_history,
-            question='Based on the chat history give summary',
+            question='',
         )
         
         print("The mesage is ",formatted_messages)

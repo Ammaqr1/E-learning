@@ -28,8 +28,7 @@ def main_overview(user_id):
 questions_intro = [
     "What is your name?",
     "Which exam(s) are you preparing for (e.g., NEET, JEE, higher secondary exams)?",
-    "How old are you?",
-    "What is your gender?",
+    "How old are you? and What is your gender?",
     "How many times have you attempted these exams before?",
     "How would you self-assess your proficiency level in physics (e.g., easy, medium, hard)?",
     "Which school or institution are you currently attending?",
@@ -74,7 +73,7 @@ if 'streak' not in st.session_state:
     st.session_state.streak = 0
 
 # Initialize the database connection
-db = PostgresDatabase(dbname='new_db_name', user='postgres', password='ammar')
+db = PostgresDatabase()
 db.connect()
 
 # Function to handle navigation
@@ -173,23 +172,6 @@ class_11_physics_chapters = {
     15: 'Waves'
 }
 
-# Generate calendar
-def generate_calendar(dates):
-    start_date = min(dates)
-    end_date = max(dates)
-    date_range = pd.date_range(start=start_date, end=end_date)
-    calendar_data = {
-        "day": [],
-        "month": [],
-        "visited": []
-    }
-    for date in date_range:
-        calendar_data["day"].append(date.day)
-        calendar_data["month"].append(date.strftime('%B'))
-        calendar_data["visited"].append(date in dates)
-    return calendar_data
-
-
 
 def handle_chapter_assessment(chapter_number, i):
     st.title(f'Chapter {chapter_number} Assessment')
@@ -198,6 +180,11 @@ def handle_chapter_assessment(chapter_number, i):
         navigate('test')
         return
     
+        
+    if st.button(f"history_{i}", key=f'history_{i}_button'):
+        st.session_state.page = f'history_{i}'
+        st.rerun()
+    
     if st.button("Ask a Question", key=f'ask_question_{chapter_number}') and not st.session_state.get(f'initialized_{chapter_number}', False):
         initial_question = f'Ncert text book class 11 part 1 chapter {chapter_number}, Give a question'
         response = assistant.get_response(initial_question)
@@ -205,6 +192,7 @@ def handle_chapter_assessment(chapter_number, i):
         st.session_state[f'initialized_{chapter_number}'] = True
         st.rerun()
         
+
         
     if 'j' not in st.session_state:
         st.session_state.j = 0
@@ -256,9 +244,7 @@ def handle_chapter_assessment(chapter_number, i):
             
             st.session_state[f'user_followup_{chapter_number}'] = ""
 
-        if st.button(f"history_{i}", key=f'history_{i}_button'):
-            st.session_state.page = f'history_{i}'
-            st.rerun()
+
 
             st.rerun()
 
@@ -269,8 +255,10 @@ if st.session_state.page == 'welcome':
     st.title("Welcome")
     if st.button("Login", key='welcome_login'):
         navigate('login')
+        st.rerun()
     if st.button("Sign Up", key='welcome_signup'):
         navigate('signup')
+        st.rerun()
         
 
         
@@ -284,13 +272,16 @@ elif st.session_state.page == 'login':
     if st.button("Login", key='login_login'):
         if user_exists(user_id):
             st.session_state.user_id = user_id
-            navigate('dashboard')           
+            navigate('dashboard') 
+            st.rerun()          
         else:
             st.write("User does not exist. Please sign up.")
                     
 # Sign Up Page
 elif st.session_state.page == 'signup':
     st.title("Sign Up")
+    if st.button('Back',key='signup_back'):
+        navigate('welcome')
     user_id = st.text_input("Username")
     
     if st.button("Sign Up", key='signup_signup'):
@@ -303,6 +294,7 @@ elif st.session_state.page == 'signup':
             st.write('Your account has been created successfully.')
             st.session_state.user_id = user_id
             navigate('evaluation')
+            st.rerun()
           
 
 # Evaluation Page
@@ -328,17 +320,17 @@ elif st.session_state.page == 'evaluation':
             db.save_message(user_id, f"profile_evaluation_{user_id}", "user", answer)
             st.session_state.current_question += 1
             if st.session_state.current_question == len(questions):
-                # pass
                 st.session_state.question_activation += 1
 
             else:
                 st.rerun()  # Reload the page to show the next question
     else:
         st.write("You have completed all the questions. Thank you! Now you will be redirected to another page.")
-        if st.button('please click here',key='key_more_page'):
-            navigate('more')
-            st.session_state.current_question = 0
-                      
+        # if st.button('please click here',key='key_more_page'):
+        navigate('more')
+        st.session_state.current_question = 0
+        st.rerun()
+                    
 
 
 # More Page
@@ -362,6 +354,7 @@ elif st.session_state.page == 'more':
         if st.button("Submit Answer", key=f'evaluation_submit_{current_question}'):
             db.save_message(user_id, f'evaluation_question_{user_id}', "user", answer)
             st.session_state.current_questions += 1
+
             if st.session_state.current_questions == len(questions):
                 navigate('dashboard')
             else:
@@ -370,6 +363,7 @@ elif st.session_state.page == 'more':
         st.write("You have completed all the questions. Thank you! Now you will be redirected to another page.")
         if st.button('please click here',key='key_more_page'):
             navigate('dashboard')
+            st.rerun()
 
 
 # Dashboard Page
@@ -695,7 +689,7 @@ elif st.session_state.page.startswith('summary_chapter_'):
                 st.session_state[f'{chapter_number}'] = summary
                 st.write(summary)
     else:
-            st.write("No summary available.")
+        pass
     
             
 
@@ -706,7 +700,8 @@ elif st.session_state.page == 'Your_understanding':
        
     user_id = st.session_state.user_id
               
-    sumi = QAsummary(user_id,f'evaluation_question_{user_id}')  
+    sumi = QAsummary(user_id,f'evaluation_question_{user_id}')
+      
     summary = sumi.fetch_questions()  
     
     
@@ -717,7 +712,5 @@ elif st.session_state.page == 'Your_understanding':
     elif 'summary' in st.session_state:
             with st.expander("View Response"):  
                 st.write(st.session_state['summary'])
-    else:
-            st.write("No summary available.")
 
 

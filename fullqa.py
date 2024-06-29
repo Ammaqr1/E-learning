@@ -26,8 +26,7 @@ class RAGSystem:
         self.user_id = user_id
         
         # Initialize database connection
-        self.db = PostgresDatabase(dbname='postgres', user='postgres', password='ammar')
-        self.db.dbname = 'new_db_name'
+        self.db = PostgresDatabase()
         self.db.connect()
         
         self.setup_generative_ai()

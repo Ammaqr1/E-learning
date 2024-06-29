@@ -22,7 +22,7 @@ class AshokaNCERTQA:
         api_key = os.getenv("GOOGLE_API_KEY")
         genai.configure(api_key=api_key)
         
-        self.db = PostgresDatabase(dbname='new_db_name', user='postgres', password='ammar')
+        self.db = PostgresDatabase()
         self.db.connect()
         
         self.profile_summary = profile_summary

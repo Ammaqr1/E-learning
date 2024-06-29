@@ -1,14 +1,21 @@
+from dotenv import load_dotenv
+import os
 import psycopg2
 from psycopg2 import sql
 import datetime
+from urllib.parse import urlparse
+
+load_dotenv()
 
 class PostgresDatabase:
-    def __init__(self, dbname, user, password, host='localhost', port='5432'):
-        self.dbname = dbname
-        self.user = user
-        self.password = password
-        self.host = host
-        self.port = port
+    def __init__(self):
+        db_url = os.getenv('DATABASE_URL')
+        result = urlparse(db_url)
+        self.dbname = result.path[1:]
+        self.user = result.username
+        self.password = result.password
+        self.host = result.hostname
+        self.port = result.port
         self.connection = None
         self.cursor = None
 
@@ -23,8 +30,13 @@ class PostgresDatabase:
             )
             self.cursor = self.connection.cursor()
             print("Database connection successful.")
+        except psycopg2.OperationalError as error:
+            print(f"OperationalError: {error}")
         except (Exception, psycopg2.DatabaseError) as error:
-            print(f"Error: {error}")
+            print(f"DatabaseError: {error}")
+        finally:
+            if not self.connection:
+                print("Connection failed, please check the connection details and server status.")
 
     def create_database(self, new_dbname):
         try:
@@ -112,24 +124,24 @@ class PostgresDatabase:
         print("Database connection closed.")
 
 # Example usage:
-if __name__ == '__main__':
-    # pass
-    db = PostgresDatabase(dbname='new_db_name', user='postgres', password='ammar')
-    db.connect()
+# if __name__ == '__main__':
+#     # pass
+#     db = PostgresDatabase()
+#     db.connect()
 
-    # create_table_sql_chat = '''
-    # CREATE TABLE chat_messages (
-    #     id SERIAL PRIMARY KEY,
-    #     user_id VARCHAR(255) NOT NULL,
-    #     conversation_id VARCHAR(255) NOT NULL,
-    #     role VARCHAR(50) NOT NULL,  -- 'user' or 'assistant'
-    #     content TEXT NOT NULL,
-    #     tags TEXT[] DEFAULT '{}',  -- Array of tags
-    #     timestamp TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-    # );
-    # '''
-    # # Uncomment the line below to create the table
-    # # db.create_table(create_table_sql_chat)
+#     create_table_sql_chat = '''
+#     CREATE TABLE chat_messages (
+#         id SERIAL PRIMARY KEY,
+#         user_id VARCHAR(255) NOT NULL,
+#         conversation_id VARCHAR(255) NOT NULL,
+#         role VARCHAR(50) NOT NULL,  -- 'user' or 'assistant'
+#         content TEXT NOT NULL,
+#         tags TEXT[] DEFAULT '{}',  -- Array of tags
+#         timestamp TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+#     );
+#     '''
+#     # # Uncomment the line below to create the table
+#     db.create_table(create_table_sql_chat)
 
     # # Save a message
     # db.save_message("user124", "default", "assistant", "The user is new")
