@@ -6,5 +6,5 @@ datetime
 python-dotenv
 langchain-google-genai
 langchain-pinecone
-psycopg2
+psycopg2-binary
 streamlit
