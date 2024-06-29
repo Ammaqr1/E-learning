@@ -11,7 +11,6 @@ from langchain.load import dumps
 import json
 from database2 import PostgresDatabase
 import streamlit as st
-from langchain_google_vertexai import ChatVertexAI
 
 
 

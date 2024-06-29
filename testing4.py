@@ -56,7 +56,6 @@ class UserVisitTracker:
         st.write(f"Last visit: {self.user_data.get('last_visit')}")
         st.write(f"Total days visited: {self.user_data['total_days']}")
         st.button(f"⭐ {self.user_data['consecutive_days']}")
-        print('frist returning',self.user_data['consecutive_days'])
         return self.user_data['consecutive_days']
 
     def generate_calendar(self, dates):
@@ -116,7 +115,9 @@ class UserVisitTracker:
         time_spent_df["Day of Week"] = time_spent_df["Date"].dt.day_name()
         time_spent_df["Time Spent (hours)"] = time_spent_df["Time Spent (minutes)"] / 60
 
-        time_spent_per_day = time_spent_df.groupby("Day of Week").sum().reindex(
+        time_spent_per_day = time_spent_df.groupby("Day of Week").agg({
+            "Time Spent (hours)": "sum"
+        }).reindex(
             ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
         ).reset_index()
 
@@ -139,14 +140,13 @@ class UserVisitTracker:
 
         st.plotly_chart(fig_time_spent)
 
-# def main(user_id):
+
+# def main():
+#     user_id = 'user123'
 #     tracker = UserVisitTracker(user_id)
-#     streak = tracker.display_user_info()
-#     print(streak,'streask')
+#     tracker.display_user_info()
 #     tracker.display_visit_calendar()
 #     tracker.display_time_spent()
-#     return streak
-    
 
 # if __name__ == "__main__":
 #     main()

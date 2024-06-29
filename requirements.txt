@@ -1,0 +1,10 @@
+langchain
+plotly
+pandas
+pdfplumber
+datetime
+python-dotenv
+langchain-google-genai
+langchain-pinecone
+psycopg2
+streamlit

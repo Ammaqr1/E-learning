@@ -1,6 +1,9 @@
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_google_genai import GoogleGenerativeAI, HarmBlockThreshold, HarmCategory
 from database2 import PostgresDatabase  # Replace with actual import for your database
+import os
+import google.generativeai as genai
+from dotenv import load_dotenv
 
 class QuestionGenerator16:
     def __init__(self, user_id):
@@ -8,6 +11,11 @@ class QuestionGenerator16:
         self.db = PostgresDatabase(dbname='new_db_name', user='postgres', password='ammar')
         self.db.connect()
         self.user_id = user_id
+        
+        
+        load_dotenv()
+        api_key = os.getenv("GOOGLE_API_KEY")
+        genai.configure(api_key=api_key)
 
         # Instruction to the system
         self.instruction_to_system = '''
