@@ -132,6 +132,8 @@ if 'student_analysis' not in st.session_state:
 if 'star_count' not in st.session_state:
     st.session_state.star_count = 0
     
+    
+    
 
 # Function to handle chapter initialization and response generation
 def handle_chapter(chapter_number, assistant):
@@ -269,6 +271,7 @@ elif st.session_state.page == 'login':
     st.title("Login")
     if st.button('back',key='login_back'):
         navigate('welcome')
+        st.rerun()
     user_id = st.text_input("Username")
     if st.button("Login", key='login_login'):
         if user_exists(user_id):
@@ -283,6 +286,7 @@ elif st.session_state.page == 'signup':
     st.title("Sign Up")
     if st.button('Back',key='signup_back'):
         navigate('welcome')
+        st.rerun()
     user_id = st.text_input("Username")
     
     if st.button("Sign Up", key='signup_signup'):
@@ -378,25 +382,33 @@ elif st.session_state.page == 'dashboard':
     
     if st.button('Student analysis',key = "student_analysis"):
         navigate('Overview')
+        st.rerun()
     if st.button("Summary", key='dashboard_summary'):
         navigate('summary')
+        st.rerun()
     if st.button('Profile Details', key='dashboard_profile_details'):
         navigate('profile_summary')
+        st.rerun()
     if st.button('Start Studying', key='dashboard_start_studying'):
         navigate('study')
+        st.rerun()
     if st.button('Chapter_wise_TEST', key = 'chapter_wise_test'):
         navigate('test')
+        st.rerun()
     if st.button('Live Doubt Clearance', key='dashboard_live_doubt_clearance'):
         navigate('Doubt_clearance')
+        st.rerun()
     if st.button('solve_x'):
         navigate('solve_x')
+        st.rerun()
     if st.button('log out'):
         navigate('welcome')
+        st.rerun()
 
 elif st.session_state.page == 'Overview':
     if st.button('back', key='student_analysis_back'):
         navigate('dashboard')
-        
+        st.rerun()
 
     
     
@@ -413,6 +425,7 @@ elif st.session_state.page == 'Overview':
 elif st.session_state.page == 'solve_x':
     if st.button('back',key ='back_button_in_solvex'):
         navigate('dashboard')
+        st.rerun()
     
     from PIL import Image
 
@@ -440,6 +453,7 @@ elif st.session_state.page == 'study':
     st.title('Choose the chapter to start learning') 
     if st.button('Back', key='study_back'):
         navigate('dashboard')
+        st.rerun()
     
     st.title("Select a Chapter")
     for i in range(1, 16):
@@ -463,7 +477,8 @@ elif st.session_state.page.startswith('chapter_'):
 # Chapter 1 QA
 elif st.session_state.page == 'test':
     if st.button('Back', key='chapter_one_qa_back'):
-        navigate('dashboard')     
+        navigate('dashboard')
+        st.rerun()     
     st.title("Select a Chapter for Assessment")
     for i in range(1, 16):
         if st.button(f"Chapter {i} Assessment", key=f'chapter_test_{i}_button'):
@@ -490,6 +505,7 @@ elif st.session_state.page.startswith('history_'):
     chapter_number = int(st.session_state.page.split('_')[-1])
     if st.button('Back',key = f'history_{chapter_number}'):
         navigate(f'test_lesson_wise_{chapter_number}')
+        st.rerun()
         
         
     chapter_name = class_11_physics_chapters[chapter_number]
@@ -525,6 +541,7 @@ elif st.session_state.page == 'Doubt_clearance':
     st.title("Live Doubt Clearance")
     if st.button('Back', key='doubt_clearance_back'):
         navigate('dashboard')
+        st.rerun()
         
         
 
@@ -535,12 +552,14 @@ elif st.session_state.page == 'Doubt_clearance':
                
     if st.button('History',key="live_history"):
         navigate('History_Doubt')
+        st.rerun()
         
       
 elif st.session_state.page == 'History_Doubt':
     st.title("History messages Doubts")
     if st.button('Back'):
-        navigate('Doubt_clearance')  
+        navigate('Doubt_clearance')
+        st.rerun()  
     from datetime import datetime
     
     
@@ -570,51 +589,42 @@ elif st.session_state.page == 'profile_summary':
     st.title("Profile Summary Page")
     if st.button('Back', key='profile_summary_back'):
         navigate('dashboard')
-    if st.button('update_profile_summary',key='update_profile_summary'):
+        st.rerun()
+    if st.button('update_profile',key='update_profile_summary'):
         navigate('update_profile_summary')
         user_id = st.session_state.user_id 
         db.clear_message_history(user_id,f'profile_summary_{user_id}')
         db.clear_message_history(user_id,f'profile_evaluation_{user_id}')
         st.session_state.current_question = 0
+        st.rerun()
         
-        
-    # user_id = st.session_state.user_id
-    # sumi = Profile_summary(user_id)  
-    # sumi.fetch_questions()  
-    
-    
-      
 
-
-        
+    
         
 
     if not st.session_state.profile_updater:
         user_id = st.session_state.user_id
         sumi = Profile_summary(user_id)  
-        sumi.fetch_questions() 
-        profile_summary_dict = db.get_message_history(user_id, f'profile_summary_{user_id}')
-        profile_summary = []
-        for messages in profile_summary_dict:
-            profile_summary.append(messages['content'][1:-1])  
+        profile_summary = sumi.fetch_questions() 
         st.session_state.profile_updater = profile_summary
     else:
-        print("hello")
         profile_summary = st.session_state.profile_updater
     
     
     
        
     
-    if st.button('Show profile summary',key='show profile summary evaluation'):       
+    if st.button('Update profile summary',key='show profile summary evaluation'):
         with st.expander("View Response"):
                 st.session_state['profile_summary'] = profile_summary
                 st.write(profile_summary)
     elif 'profile_summary' in st.session_state:
             with st.expander("View Response"):  
                 st.write(st.session_state['profile_summary'])
-    else:
-            st.write("No summary available.")
+
+            
+            
+            
                         
                         
 # update_profile_summary page                   
@@ -625,7 +635,6 @@ elif st.session_state.page == 'update_profile_summary':
          
     questions = st.session_state.questionss
     current_question = st.session_state.current_question
-    print(current_question)
 
     if current_question < len(questions):
         question = questions[current_question]
@@ -633,15 +642,14 @@ elif st.session_state.page == 'update_profile_summary':
             print(current_question)
             db.save_message(user_id, f"profile_evaluation_{user_id}", "assistant", question)
         st.write(question)
-        answer = st.text_input("Your answer")
-        
-        if st.button("Submit Answer", key=f'evaluation_submit_{current_question}'):
+        answer = st.text_input("Your answer", key=f'answer_{current_question}', on_change=lambda: st.session_state.update({f'answer_{current_question}_submitted': True}))
+        if st.session_state.get(f'answer_{current_question}_submitted', False):
             db.save_message(user_id, f"profile_evaluation_{user_id}", "user", answer)
             st.session_state.current_question += 1
-            if st.session_state.current_question == len(questions):
-                pass
-            else:
-                st.rerun()  # Reload the page to show the next question
+            st.session_state[f'answer_{current_question}_submitted'] = False
+
+            # Immediately rerun to display the next question without noticeable delay
+            st.rerun()
     else:
         navigate('dashboard')
         st.session_state.current_question = 0
@@ -657,11 +665,13 @@ elif st.session_state.page == 'update_profile_summary':
 elif st.session_state.page == 'summary':
     st.title("Summary Page")
     if st.button('Back', key='summary_back'):
-        navigate('dashboard')    
+        navigate('dashboard') 
+        st.rerun()   
             
     user_id = st.session_state.user_id     
     if st.button("Your Understanding", key='summary_your_understanding'):
         navigate('Your_understanding')
+        st.rerun()
     
     for i in range(1, 16):
         if st.button(f"Chapter_{i}_summary", key=f'chapter_summary_{i}_button'):
@@ -674,18 +684,19 @@ elif st.session_state.page.startswith('summary_chapter_'):
     chapter_name = class_11_physics_chapters[chapter_number]
     if st.button('back',key=f'{chapter_name}'):
         navigate('summary')
+        st.rerun()
     user_id = st.session_state.user_id
     full_chapter = str(chapter_number) + ' ' + chapter_name   
     chapter_x = f'Part 1 Chapter {full_chapter}'
     conversational_id = f'question_answer_{chapter_x}_{user_id}'
-    qa_summary = QAsummary(user_id,conversational_id)
-    summary = qa_summary.fetch_questions()
-    if st.button('Show summary',key=f'show {chapter_number} evaluation'):       
+    with st.spinner('gathering data'):
+        qa_summary = QAsummary(user_id,conversational_id)
+        summary = qa_summary.fetch_questions()
+    if st.button('Update summary',key=f'show {chapter_number} evaluation'):       
         with st.expander("View Response"):
                 st.session_state[f'{chapter_number}'] = summary
                 st.write(summary)
-    else:
-        pass
+
     
             
 
@@ -693,6 +704,7 @@ elif st.session_state.page == 'Your_understanding':
     st.title('Evaluation_summary')
     if st.button('Back',key='Your_understanding_back'):
         navigate('summary')
+        st.rerun()
        
     user_id = st.session_state.user_id
               

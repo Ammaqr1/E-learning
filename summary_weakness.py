@@ -44,7 +44,7 @@ class QAsummary:
     def fetch_questions(self):
         # Fetch message history based on user_id from the database
         chat_history = self.db.get_message_history(self.user_id, self.conversational_id)
-        print(chat_history)
+        # print(chat_history)
         
         # print('chat history',chat_history)
 
@@ -54,7 +54,7 @@ class QAsummary:
             question='',
         )
         
-        print("The mesage is ",formatted_messages)
+        # print("The mesage is ",formatted_messages)
 
         # Generate response from the language model
         response = self.llm.invoke(formatted_messages)

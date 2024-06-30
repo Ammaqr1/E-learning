@@ -82,9 +82,9 @@ class SQLiteDatabase:
         print("Database connection closed.")
 
 # Example usage:
-# if __name__ == '__main__':
-    # db = SQLiteDatabase()
-    # db.connect('chat_database.db')
+if __name__ == '__main__':
+    db = SQLiteDatabase()
+    db.connect('chat_database.db')
 
     # create_table_sql = """
     # CREATE TABLE IF NOT EXISTS chat_messages (
@@ -99,7 +99,7 @@ class SQLiteDatabase:
     # db.create_table(create_table_sql)
     
     # Test the database operations
-    # db.save_message('user123', 'conv456', 'user', 'Hello, how are you?')
+    db.save_message('user123', 'conv456', 'user', 'Hello, how are you?')
     # history = db.get_message_history('user123', 'conv456')
     # print(history)
     # # db.clear_message_history('user123', 'conv456')

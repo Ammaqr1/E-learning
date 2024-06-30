@@ -123,7 +123,7 @@ class AshokaNCERTQA:
         Note: The questions should be matched to the learner's profile and relevant exam type (NEET, JEE, Higher Secondary, CUET, etc.)
         """
         
-        self.model = ChatGoogleGenerativeAI(model="gemini-1.5-flash", temperature=0.2)
+        # self.model = ChatGoogleGenerativeAI(model="gemini-1.5-flash", temperature=0.2)
         # self.model = GoogleGenerativeAI(
         #     model="gemini-pro",
         #     safety_settings={
@@ -131,7 +131,23 @@ class AshokaNCERTQA:
         #     },
         # )
         # self.model = ChatVertexAI(model="gemini-pro")
+        
+        generation_config = {
+        "temperature": 1,
+        "top_p": 0.95,
+        "top_k": 64,
+        "max_output_tokens": 8192,
+        "response_mime_type": "text/plain",
+        }
 
+        self.model = genai.GenerativeModel(
+        model_name="gemini-1.5-pro",
+        generation_config=generation_config,
+        # safety_settings = Adjust safety settings
+        # See https://ai.google.dev/gemini-api/docs/safety-settings
+        )
+
+        
 
                 # Creating the prompt template
         self.question_make_prompt = ChatPromptTemplate.from_messages([
@@ -161,7 +177,7 @@ class AshokaNCERTQA:
             
         )
         self.db.save_message(self.user_id,f'question_answer_{self.chapter_x}_{self.user_id}','user',user_question)
-        response = self.model.invoke(formated_question)
+        response = self.model.generate_content(formated_question)
         self.db.save_message(self.user_id,f'question_answer_{self.chapter_x}_{self.user_id}','assistant',response.content)
         end_time = time.time()
         total_time = end_time - self.start_time
@@ -177,15 +193,15 @@ class AshokaNCERTQA:
     
     
 
-# import streamlit as st
+import streamlit as st
 
 
-# # Initializing the assistant
-# user_id = 'user124'
-# assistant = AshokaNCERTQA('Ammar', "ncert text class 11 part1_chapter1 physical world", user_id)
+# Initializing the assistant
+user_id = 'user124'
+assistant = AshokaNCERTQA('Ammar', "ncert text class 11 part1_chapter1 physical world", user_id)
 
-# question = st.text_input('enter your question')
+question = st.text_input('enter your question')
 
-# if question:
-#     answer = assistant.get_response(question)
-#     st.write(answer)
+if question:
+    answer = assistant.get_response(question)
+    st.write(answer)

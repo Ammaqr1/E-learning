@@ -45,7 +45,7 @@ class QuestionGenerator16:
         # Fetch message history based on user_id from the database
         chat_history = self.db.get_message_history(self.user_id, f'profile_evaluation_{self.user_id}')
         
-        print(chat_history)
+        # print(chat_history)
 
         # Format the prompt template with chat history
         formatted_messages = self.question_make_prompt.format_messages(
@@ -62,7 +62,7 @@ class QuestionGenerator16:
         
         self.db.save_message(self.user_id,f'profile_questions16_{self.user_id}','assistant',question_list)
         
-        print(question_list)
+        # print(question_list)
 
         return question_list
 

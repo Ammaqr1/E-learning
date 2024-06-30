@@ -86,10 +86,11 @@ class Profile_summary:
 
         # Split response into a list of questions
         profile_summary = response.strip().split('\n')
-        # print(profile_summary)
         
         self.db.clear_message_history(self.user_id,f'profile_summary_{self.user_id}')
         self.db.save_message(self.user_id,f'profile_summary_{self.user_id}','assistant',profile_summary)
+        
+        return profile_summary
         
         
         
