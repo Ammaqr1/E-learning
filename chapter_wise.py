@@ -28,7 +28,7 @@ class AshokaNCERTAssistant:
 
         **Let's Dive into the NCERT!**
 
-        **Chapter:** **Page/Paragraph/Sentence:** {self.chapter_x}
+        **Chapter:** **Page/Paragraph/Sentence :** {self.chapter_x}
 
 """
         
