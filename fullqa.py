@@ -9,7 +9,8 @@ from operator import itemgetter
 from langchain_pinecone import PineconeVectorStore
 from langchain.load import dumps
 import json
-from database2 import PostgresDatabase
+# from database2 import PostgresDatabase
+from database3 import SQLiteDatabase
 import streamlit as st
 
 
@@ -26,8 +27,8 @@ class RAGSystem:
         self.user_id = user_id
         
         # Initialize database connection
-        self.db = PostgresDatabase()
-        self.db.connect()
+        self.db = SQLiteDatabase()
+        self.db.connect('chat_database.db')
         
         self.setup_generative_ai()
         self.setup_vector_store()
@@ -36,11 +37,26 @@ class RAGSystem:
         # Configure Google Generative AI
         self.model = ChatGoogleGenerativeAI(model="gemini-pro", temperature=0)
         
-        template = """You are an AI language model assistant. Your task is to generate only five 
-        different versions of the given user question to retrieve relevant documents from a vector 
-        database. By generating multiple perspectives on the user question, your goal is to help
-        the user overcome some of the limitations of the distance-based similarity search. 
-        Provide these alternative questions separated by newlines. Original question: {question}"""
+        template = """You are an AI language model assistant. Your task is to generate FOUR different versions of the given user question to retrieve relevant documents from a vector database. By generating multiple perspectives on the user question, your goal is to help the user overcome some of the limitations of the distance-based similarity search. 
+        Provide these alternative questions separated by newlines.
+
+            Original question: {question}
+
+            Instructions:
+            2. Ensure the question is related to NCERT physics class 11 textbook.
+            3. If the question is not related to NCERT physics, respond with "I only know answers related to NCERT physics."
+            4. If the question is related to NCERT physics, generate FOUR different versions of the question for better document retrieval.
+
+
+            Example Output:
+            Original question: What is the difference between scalar and vector quantities?
+
+            1. How do scalar quantities differ from vector quantities in physics?
+            2. Can you explain the distinction between scalar and vector quantities with examples?
+            3. What are the key differences between scalar and vector quantities?
+            4. How would you describe scalar quantities compared to vector quantities?
+
+            Note: Ensure all responses are relevant to NCERT physics and tailored to the learner's profile. If the user's query is outside the scope of NCERT physics, respond appropriately."""
         
         
         self.prompt_perspectives = ChatPromptTemplate.from_template(template)
@@ -86,13 +102,15 @@ class RAGSystem:
         answer_template_2 = """
         Chapter: {context}
         Doubt: {question}
-        Role: 
+
         Instructions:
         1. Review the provided profile summary to understand the learner's background, strengths, and weaknesses.
-        2. Receive a specific doubt or question related to ncert physics chapter class 11 from the learner.
+        2. Receive a specific doubt or question related to NCERT physics chapter class 11 from the learner.
         3. Provide a detailed, clear explanation tailored to the learner's understanding and learning style.
         4. Include step-by-step guidance and related concepts to ensure comprehensive understanding.
         5. Suggest free resources (e.g., websites, videos, articles) for further learning and practice.
+        6. If the user asks a question not related to physics, respond with "I only know answers related to NCERT physics."
+
         Output Format:
         1. Doubt/Question: [Present the learner's doubt or question]
         2. Detailed Explanation:
@@ -103,11 +121,13 @@ class RAGSystem:
         - Tips on areas to focus on for better understanding.
         3. Free Resources:
         - List of websites, videos, or articles that provide additional explanations or practice problems related to the question.
+
         Profile Summary Example:
         - Background: [Student's previous education, familiarity with physics, etc.]
         - Strengths: [Specific areas where the student excels]
         - Weaknesses: [Specific areas where the student struggles]
         - Learning Style: [Preferred learning methods, e.g., visual, auditory, kinesthetic]
+
         Example Output:
         1. Doubt/Question: Why does an object in motion stay in motion according to Newton's first law?
         2. Detailed Explanation:
@@ -118,7 +138,10 @@ class RAGSystem:
         - Tips: Focus on understanding the role of external forces like friction and gravity in changing the motion of objects.
         3. Free Resources:
         - [Khan Academy](https://www.khanacademy.org/science/physics): Provides video lessons and practice problems on Newton's laws of motion.
-        - [
+        - [HyperPhysics](http://hyperphysics.phy-astr.gsu.edu): A comprehensive resource for physics concepts and explanations.
+
+        Note: Ensure all responses are relevant to NCERT physics and tailored to the learner's profile. If the user's query is outside the scope of NCERT physics, respond appropriately.
+
         """
 
         prompt = ChatPromptTemplate.from_template(answer_template_1 + answer_template_2)

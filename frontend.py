@@ -2,7 +2,7 @@
 
 import streamlit as st
 from chapter_wise import AshokaNCERTAssistant
-from database2 import PostgresDatabase
+# from database2 import PostgresDatabase
 from QandA import AshokaNCERTQA
 from fullqa import RAGSystem
 from profile_summary import Profile_summary
@@ -10,7 +10,8 @@ from summary_weakness import QAsummary
 from question_generator_16 import QuestionGenerator16
 from solve_x import SolveX
 from testing4 import UserVisitTracker
-
+import time
+from database3 import SQLiteDatabase
 import json
 from datetime import datetime, timedelta
 import random
@@ -73,8 +74,8 @@ if 'streak' not in st.session_state:
     st.session_state.streak = 0
 
 # Initialize the database connection
-db = PostgresDatabase()
-db.connect()
+db = SQLiteDatabase()
+db.connect('chat_database.db')
 
 # Function to handle navigation
 def navigate(page):
@@ -296,41 +297,36 @@ elif st.session_state.page == 'signup':
             navigate('evaluation')
             st.rerun()
           
-
-# Evaluation Page
 elif st.session_state.page == 'evaluation':
     st.title("Evaluation Page")
     user_id = st.session_state.user_id
-    if not user_id or not user_exists(user_id):
-        st.write("Access denied. Please sign up as a new user to access this page.")
-        st.stop()
 
     questions = st.session_state.questionss
     current_question = st.session_state.current_question
 
     if current_question < len(questions):
         question = questions[current_question]
-        if current_question == 0 :
-            # print(db.get_message_history(user_id, f"profile_evaluation_{user_id}")[-1]['content'] != question)
+        if current_question == 0:
             db.save_message(user_id, f"profile_evaluation_{user_id}", "assistant", question)
         st.write(question)
-        answer = st.text_input("Your answer")
         
-        if st.button("Submit Answer", key=f'evaluation_submit_{current_question}'):
+        # Capture the answer and detect Enter key press
+        answer = st.text_input("Your answer", key=f'answer_{current_question}', on_change=lambda: st.session_state.update({f'answer_{current_question}_submitted': True}))
+
+        if st.session_state.get(f'answer_{current_question}_submitted', False):
             db.save_message(user_id, f"profile_evaluation_{user_id}", "user", answer)
             st.session_state.current_question += 1
-            if st.session_state.current_question == len(questions):
-                st.session_state.question_activation += 1
+            st.session_state[f'answer_{current_question}_submitted'] = False
 
-            else:
-                st.rerun()  # Reload the page to show the next question
+            # Immediately rerun to display the next question without noticeable delay
+            st.rerun()
+        
     else:
         st.write("You have completed all the questions. Thank you! Now you will be redirected to another page.")
-        # if st.button('please click here',key='key_more_page'):
+        st.session_state.question_activation += 1
         navigate('more')
         st.session_state.current_question = 0
-        st.rerun()
-                    
+        st.rerun()  
 
 
 # More Page

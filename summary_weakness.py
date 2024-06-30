@@ -1,12 +1,13 @@
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_google_genai import GoogleGenerativeAI, HarmBlockThreshold, HarmCategory
-from database2 import PostgresDatabase
+# from database2 import PostgresDatabase
+from database3 import SQLiteDatabase
 
 class QAsummary:
     def __init__(self, user_id,conversational_id):
         # Initialize the database connection with default parameters
-        self.db = PostgresDatabase()
-        self.db.connect()
+        self.db = SQLiteDatabase()
+        self.db.connect('chat_database.db')
         self.user_id = user_id
         self.conversational_id = conversational_id
 

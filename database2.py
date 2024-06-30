@@ -124,10 +124,10 @@ class PostgresDatabase:
         print("Database connection closed.")
 
 # Example usage:
-# if __name__ == '__main__':
+if __name__ == '__main__':
 #     # pass
-#     db = PostgresDatabase()
-#     db.connect()
+    db = PostgresDatabase()
+    db.connect()
 
 #     create_table_sql_chat = '''
 #     CREATE TABLE chat_messages (
@@ -148,10 +148,11 @@ class PostgresDatabase:
 
     # # Retrieve message history
     # history = db.get_message_history('hello', 'profile_evaluation_hello')
-    # history = db.get_message_history(";lakj", f'profile_summary_;lakj')
-    # db.save_message('user123',f'question_answer_chapter_chapter_1_user_123','assistant',"response")
+    # user_id = 'user123'
+    # history = db.get_message_history(user_id, f"profile_evaluation_{user_id}")
+    # # db.save_message('user123',f'question_answer_chapter_chapter_1_user_123','assistant',"response")
     # print(history)
-    # print(len(history))
+    # # print(len(history))
     # al = []
     # for message in history:
     #     al.append(message['content'][1:-1])

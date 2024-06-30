@@ -16,9 +16,7 @@ class AshokaNCERTAssistant:
         genai.configure(api_key=api_key)
         
         self.profile_summary = profile_summary
-        print(self.profile_summary)
         self.chapter_x = chapter_x
-        print('chapter',self.chapter_x)
         # self.page_paragraph_sentence = page_paragraph
                 
         self.template_1 = f"""

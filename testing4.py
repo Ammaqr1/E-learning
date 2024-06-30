@@ -1,6 +1,6 @@
 import streamlit as st
 import json
-from datetime import datetime, timedelta
+from datetime import datetime
 import random
 import pandas as pd
 import plotly.graph_objects as go

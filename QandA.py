@@ -11,19 +11,23 @@ from langchain.schema import Document
 from langchain_pinecone import PineconeVectorStore
 from langchain.globals import set_verbose, get_verbose
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from database2 import PostgresDatabase
+# from database2 import PostgresDatabase
+from database3 import SQLiteDatabase
+from langchain_google_genai import GoogleGenerativeAI, HarmBlockThreshold, HarmCategory
+
 import re
-
-
+import streamlit as st
+import time
 
 class AshokaNCERTQA:
     def __init__(self, profile_summary, chapter_x,user_id):
+        self.start_time = time.time()
         load_dotenv()
         api_key = os.getenv("GOOGLE_API_KEY")
         genai.configure(api_key=api_key)
         
-        self.db = PostgresDatabase()
-        self.db.connect()
+        self.db = SQLiteDatabase()
+        self.db.connect('chat_database.db')
         
         self.profile_summary = profile_summary
         
@@ -62,6 +66,8 @@ class AshokaNCERTQA:
         - If incorrect, explain why the answer is wrong, identify areas for improvement, and provide a detailed explanation of the correct answer.
         3. If the last message in the chat history is "Next question":
         - Present the next question, varying in difficulty (easy, medium, hard), and ensuring it's not repetitive.
+        4. If the last message in the chat history is unrelated to physics:
+        - Respond with "I only know answers related to NCERT physics."
 
         Output Format:
         1. Question: [Present the question]
@@ -94,8 +100,8 @@ class AshokaNCERTQA:
        
 
         Question: {question}
-        
-        context: {context} explain based on this context
+                
+        Context: {context} 
 
         User Commands:
         * "Ask a question" -> Receive a question from the specified chapter.
@@ -111,11 +117,19 @@ class AshokaNCERTQA:
         - If incorrect, provides feedback and a detailed explanation.
         3. User: "Next question"
         Bot: [Provides the next question with a different difficulty level]
+        4. If the user's message is unrelated to physics:
+        Bot: [Responds with "I only know answers related to NCERT physics."]
 
         Note: The questions should be matched to the learner's profile and relevant exam type (NEET, JEE, Higher Secondary, CUET, etc.)
         """
         
         self.model = ChatGoogleGenerativeAI(model="gemini-1.5-flash", temperature=0.2)
+        # self.model = GoogleGenerativeAI(
+        #     model="gemini-pro",
+        #     safety_settings={
+        #         HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
+        #     },
+        # )
         # self.model = ChatVertexAI(model="gemini-pro")
 
 
@@ -150,6 +164,10 @@ class AshokaNCERTQA:
         # role = 'A genius ncert physics class 11 question and explanation giver'
         response = self.model.invoke(formated_question)
         self.db.save_message(self.user_id,f'question_answer_{self.chapter_x}_{self.user_id}','assistant',response.content)
+        end_time = time.time()
+        total_time = end_time - self.start_time
+
+
         return response.content
     
     @staticmethod
