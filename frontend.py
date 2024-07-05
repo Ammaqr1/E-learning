@@ -12,11 +12,10 @@ from solve_x import SolveX
 from testing4 import UserVisitTracker
 import time
 from database3 import SQLiteDatabase
-import json
-from datetime import datetime, timedelta
-import random
-import pandas as pd
+from datetime import datetime
 import os
+from Exam import Exam
+from exam_score import Exam_Score
 
 
 def main_overview(user_id):
@@ -45,6 +44,10 @@ questions_intro = [
     "Do you have any particular challenges or obstacles in your preparation (e.g., time management, understanding complex concepts)?"
 ]
 
+
+def format_timestamp(timestamp):
+    dt = datetime.fromisoformat(timestamp.replace('Z', '+00:00'))
+    return dt.strftime('%Y-%m-%d %H:%M:%S')
 
 # Define chapter dictionaries
 
@@ -132,7 +135,8 @@ if 'student_analysis' not in st.session_state:
 if 'star_count' not in st.session_state:
     st.session_state.star_count = 0
     
-    
+if "question_paper" not in st.session_state:
+    st.session_state.question_paper = []  
     
 
 # Function to handle chapter initialization and response generation
@@ -174,6 +178,7 @@ class_11_physics_chapters = {
     14: 'Oscillations',
     15: 'Waves'
 }
+
 
 
 def handle_chapter_assessment(chapter_number, i):
@@ -367,59 +372,96 @@ elif st.session_state.page == 'more':
 
 
 # Dashboard Page
-elif st.session_state.page == 'dashboard':
+# st.markdown("""
+#     <style>
+#     .stButton button {
+#         width: 20%;
+#         height: 40px;
+#         font-size: 16px;
+#         font-weight: bold;
+#         margin-bottom: 10px;
+#     }
+#     </style>
+#     """, unsafe_allow_html=True)
+
+import streamlit as st
+import time
+
+def navigate(page_name):
+    st.session_state.page = page_name
+
+# Assuming other parts of the code like Exam class are already defined
+
+if st.session_state.page == 'dashboard':
     st.title("Dashboard")
     
     user_id = st.session_state.user_id
     
-    
     if st.session_state.streak:
-        
         st.button(f"⭐ {st.session_state.streak}")
-
     
     st.markdown(f" #### Your user_id is   {user_id}")
     
-    if st.button('Student analysis',key = "student_analysis"):
+    if st.button('📊 Student Performance Overview', key="student_analysis"):
         navigate('Overview')
         st.rerun()
-    if st.button("Summary", key='dashboard_summary'):
+        
+    if st.button("📚 Chapter Summaries", key='dashboard_summary'):
         navigate('summary')
         st.rerun()
-    if st.button('Profile Details', key='dashboard_profile_details'):
+        
+    if st.button('👤 View Profile', key='dashboard_profile_details'):
         navigate('profile_summary')
         st.rerun()
-    if st.button('Start Studying', key='dashboard_start_studying'):
+        
+    if st.button('📖 Study Chapters', key='dashboard_start_studying'):
         navigate('study')
         st.rerun()
-    if st.button('Chapter_wise_TEST', key = 'chapter_wise_test'):
+        
+    if st.button('📝 Take Chapter Test', key='chapter_wise_test'):
         navigate('test')
         st.rerun()
-    if st.button('Live Doubt Clearance', key='dashboard_live_doubt_clearance'):
+        
+    if st.button('💬 Live Doubt Resolution', key='dashboard_live_doubt_clearance'):
         navigate('Doubt_clearance')
         st.rerun()
-    if st.button('solve_x'):
+        
+    if st.button('📝 Start Exam', key='exam'):
+        navigate('exam')
+        user_id = st.session_state.user_id  
+        st.session_state.question_paper = []    
+        with st.spinner('Generating questions...'): 
+            exam = Exam(user_id)
+            questions = exam.get_question_paper()           
+        st.session_state.question_paper.extend(questions)
+        print(st.session_state.question_paper, 'this is the st.session')
+            
+        st.session_state.question_index = 0
+        st.session_state.responses = [None] * len(questions)
+        st.session_state.start_time = time.time()
+        st.session_state.time_limit = 60
+        navigate('exam')
+        st.rerun()
+        
+    if st.button('🔍 Solve Physics/Math Problems', key='solve_x'):
         navigate('solve_x')
         st.rerun()
-    if st.button('log out'):
+        
+    if st.button('🔓 Log Out', key='log_out'):
         navigate('welcome')
         st.rerun()
 
+        
+
+
+
+    
 elif st.session_state.page == 'Overview':
     if st.button('back', key='student_analysis_back'):
-        navigate('dashboard')
-        st.rerun()
-
-    
-    
-    
+        navigate('dashboard')    
     user_id = st.session_state.user_id
     streak = main_overview(user_id)
-    st.session_state.streak = streak
-
-
-
-        
+    st.session_state.streak = streak      
 
 #solve x
 elif st.session_state.page == 'solve_x':
@@ -722,3 +764,121 @@ elif st.session_state.page == 'Your_understanding':
                 st.write(st.session_state['summary'])
 
 
+
+elif st.session_state.page == 'exam':
+    if st.button('Back', key='exam-back'):
+        # Reset session state for exam
+        st.session_state.pop('question_index', None)
+        st.session_state.pop('responses', None)
+        st.session_state.pop('start_time', None)
+        st.session_state.pop('time_limit', None)
+        navigate('dashboard')
+        st.rerun()
+    if st.button('Exam_HIstory',key='Exam_history'):
+        navigate('exam_history')
+        st.rerun()
+    
+    user_id = st.session_state.user_id
+    question_paper = st.session_state.question_paper
+    
+    if 'exam_question_and_answers' not in st.session_state:
+        st.session_state.exam_question_and_answers = []
+    # Ensure session state variables are properly initialized or reset
+    if "question_index" not in st.session_state:
+        st.session_state.question_index = 0
+    if "responses" not in st.session_state:
+        st.session_state.responses = [None] * len(question_paper)
+    if "start_time" not in st.session_state:
+        st.session_state.start_time = time.time()
+    if "time_limit" not in st.session_state:
+        st.session_state.time_limit = 60 * len(question_paper)  # Adjust time limit as needed
+
+    # Calculate the remaining time
+    elapsed_time = time.time() - st.session_state.start_time
+    remaining_time = st.session_state.time_limit - elapsed_time
+
+    # Display the timer
+    st.sidebar.title("Timer")
+    st.sidebar.write(f"Time remaining: {int(max(0, remaining_time))} seconds")
+
+    # Check if time is up
+    if remaining_time <= 0:
+        st.write("Time's up! Quiz Completed!")
+        st.write("Your responses:")
+        for q, r in zip(question_paper, st.session_state.responses):
+            response_text = f"{q['question']} - {q['options'][r] if r is not None else 'Not answered'}"
+            st.write(response_text)
+            st.session_state.exam_question_and_answers.append(response_text)
+            db.save_message(user_id, f'question_and_answer_of_exams_{user_id}', 'eqa', response_text)
+
+    else:
+        # Check if question_index is within bounds
+        if st.session_state.question_index < len(question_paper):
+            current_question = question_paper[st.session_state.question_index]
+            
+            st.header(f"Question {st.session_state.question_index + 1}")
+            st.write(current_question["question"])
+
+            # Display options as buttons
+            for i, option in enumerate(current_question["options"]):
+                if st.button(option):
+                    st.session_state.responses[st.session_state.question_index] = i
+                    st.session_state.question_index += 1
+                    st.rerun()
+
+            # Show navigation if quiz is ongoing
+            st.write(f"Question {st.session_state.question_index + 1} out of {len(question_paper)}")
+
+        else:
+            st.write("End of Quiz")
+            st.write("Quiz Completed!")
+            st.write("Your responses:")
+            for q, r in zip(question_paper, st.session_state.responses):
+                response_text = f"{q['question']} - {q['options'][r] if r is not None else 'Not answered'}"
+                st.write(response_text)
+                st.session_state.exam_question_and_answers.append(response_text)
+                db.save_message(user_id, f'question_and_answer_of_exams_{user_id}', 'eqa', response_text)
+                
+
+
+
+    if st.button('Show_score',key='show_score_of_your_exam'):
+        navigate('exam_score')
+        st.rerun()
+                
+
+elif st.session_state.page == 'exam_history':
+    if st.button('Back',key='Back_from_exam_history'):
+        navigate('dashboard')
+        st.rerun()
+        
+    user_id = st.session_state.user_id
+    data = db.get_message_history(user_id,f'question_and_answer_of_exams_{user_id}')
+    
+    for entry in data:
+        content = entry['content']
+        timestamp = format_timestamp(entry['timestamp'])
+        
+        st.write(f"**Timestamp:** {timestamp}")
+        st.write(f"**Content:** {content}")
+        st.write("---")
+        
+        
+        
+        
+elif st.session_state.page == 'exam_score':
+    if st.button('Back',key='exam_back'):
+        navigate('exam')
+        st.rerun()
+    st.title('Your Score')
+    exam_question_and_answer = st.session_state.exam_question_and_answers
+    print('this is exam quesiton and answer',exam_question_and_answer)
+    
+    
+    exams_score = Exam_Score(exam_question_and_answer)
+    with st.spinner('Getting your answer this may take a while'):
+        score = exams_score.get_score()
+    st.write(score)
+    
+        
+    
