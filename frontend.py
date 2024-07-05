@@ -26,22 +26,16 @@ def main_overview(user_id):
     return streak
 
 questions_intro = [
-    "What is your name?",
-    "Which exam(s) are you preparing for (e.g., NEET, JEE, higher secondary exams)?",
-    "How old are you? and What is your gender?",
-    "How many times have you attempted these exams before?",
-    "How would you self-assess your proficiency level in physics (e.g., easy, medium, hard)?",
-    "Which school or institution are you currently attending?",
-    "How much time do you dedicate to studying physics each week?",
-    "Do you use any additional resources (e.g., coaching classes, online courses, textbooks) for your exam preparation?",
-    "What are your strengths and weaknesses in specific physics topics (e.g., mechanics, thermodynamics, electromagnetism)?",
-    "Do you prefer certain types of learning methods (e.g., visual aids, hands-on experiments, reading textbooks)?",
-    "What is your target score or rank for your upcoming exam?",
-    "Do you have a study plan or schedule?",
-    "When is your next exam scheduled?",
-    "Do you participate in any group study sessions or discussions?",
-    "What is your motivation or reason for choosing your specific exam (e.g., career goals, personal interest)?",
-    "Do you have any particular challenges or obstacles in your preparation (e.g., time management, understanding complex concepts)?"
+    'What is your name? ✍️',
+    'Which exam(s) are you preparing for (e.g., NEET, JEE, higher secondary exams)? 📚',
+    'How would you self-assess your proficiency level in physics (e.g., easy, medium, hard)? 🌟',
+    'How much time do you dedicate to studying physics each week? ⏰',
+    'Do you use any additional resources (e.g., coaching classes, online courses, textbooks) for your exam preparation? 📖',
+    'What are your strengths and weaknesses in specific physics topics (e.g., mechanics, thermodynamics, electromagnetism)? 💪💡',
+    'Do you prefer certain types of learning methods (e.g., visual aids, hands-on experiments, reading textbooks)? 🎥🔬📖',
+    'Do you have a study plan or schedule? 📅',
+    'What is your target score or rank for your upcoming exam? 🎯',
+    'What is your motivation or reason for choosing your specific exam (e.g., career goals, personal interest)? 💼🌟',
 ]
 
 
@@ -53,6 +47,10 @@ def format_timestamp(timestamp):
 
 if 'pargra' not in st.session_state:
     st.session_state.pargra = 1
+    
+    
+if 'show_score_enable' not in st.session_state:
+    st.session_state.show_score_enable = 0
 
 class_12_physics_chapters = {
     1: 'Electric Charges and Fields',
@@ -363,7 +361,7 @@ elif st.session_state.page == 'more':
             if st.session_state.current_questions == len(questions):
                 navigate('dashboard')
             else:
-                st.rerun()  # Reload the page to show the next question
+                st.rerun()
     else:
         st.write("You have completed all the questions. Thank you! Now you will be redirected to another page.")
         if st.button('please click here',key='key_more_page'):
@@ -371,28 +369,13 @@ elif st.session_state.page == 'more':
             st.rerun()
 
 
-# Dashboard Page
-# st.markdown("""
-#     <style>
-#     .stButton button {
-#         width: 20%;
-#         height: 40px;
-#         font-size: 16px;
-#         font-weight: bold;
-#         margin-bottom: 10px;
-#     }
-#     </style>
-#     """, unsafe_allow_html=True)
 
-import streamlit as st
-import time
 
-def navigate(page_name):
-    st.session_state.page = page_name
+
 
 # Assuming other parts of the code like Exam class are already defined
 
-if st.session_state.page == 'dashboard':
+elif st.session_state.page == 'dashboard':
     st.title("Dashboard")
     
     user_id = st.session_state.user_id
@@ -439,7 +422,7 @@ if st.session_state.page == 'dashboard':
         st.session_state.question_index = 0
         st.session_state.responses = [None] * len(questions)
         st.session_state.start_time = time.time()
-        st.session_state.time_limit = 60
+        st.session_state.time_limit = 225 * len(questions)
         navigate('exam')
         st.rerun()
         
@@ -791,7 +774,7 @@ elif st.session_state.page == 'exam':
     if "start_time" not in st.session_state:
         st.session_state.start_time = time.time()
     if "time_limit" not in st.session_state:
-        st.session_state.time_limit = 60 * len(question_paper)  # Adjust time limit as needed
+        st.session_state.time_limit = 225 * len(question_paper) 
 
     # Calculate the remaining time
     elapsed_time = time.time() - st.session_state.start_time
@@ -803,6 +786,7 @@ elif st.session_state.page == 'exam':
 
     # Check if time is up
     if remaining_time <= 0:
+        st.session_state.show_score_enable += 1
         st.write("Time's up! Quiz Completed!")
         st.write("Your responses:")
         for q, r in zip(question_paper, st.session_state.responses):
@@ -833,18 +817,21 @@ elif st.session_state.page == 'exam':
             st.write("End of Quiz")
             st.write("Quiz Completed!")
             st.write("Your responses:")
+            st.session_state.show_score_enable += 1
             for q, r in zip(question_paper, st.session_state.responses):
                 response_text = f"{q['question']} - {q['options'][r] if r is not None else 'Not answered'}"
                 st.write(response_text)
                 st.session_state.exam_question_and_answers.append(response_text)
                 db.save_message(user_id, f'question_and_answer_of_exams_{user_id}', 'eqa', response_text)
                 
+                
 
 
 
     if st.button('Show_score',key='show_score_of_your_exam'):
-        navigate('exam_score')
-        st.rerun()
+        if st.session_state.show_score_enable > 0:
+            navigate('exam_score')
+            st.rerun()
                 
 
 elif st.session_state.page == 'exam_history':

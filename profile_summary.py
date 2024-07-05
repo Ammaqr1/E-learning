@@ -22,24 +22,16 @@ class Profile_summary:
         Weaknesses: 
         Solutions: 
 
-        Questions:
-        1. What is your name?
-        2. Which exam(s) are you preparing for (e.g., NEET, JEE, higher secondary exams)?
-        3. How old are you?
-        4. What is your gender?
-        5. How many times have you attempted these exams before?
-        6. How would you self-assess your proficiency level in physics (e.g., easy, medium, hard)?
-        7. Which school or institution are you currently attending?
-        8. How much time do you dedicate to studying physics each week?
-        9. Do you use any additional resources (e.g., coaching classes, online courses, textbooks) for your exam preparation?
-        10. What are your strengths and weaknesses in specific physics topics (e.g., mechanics, thermodynamics, electromagnetism)?
-        11. Do you prefer certain types of learning methods (e.g., visual aids, hands-on experiments, reading textbooks)?
-        12. What is your target score or rank for your upcoming exam?
-        13. Do you have a study plan or schedule?
-        14. When is your next exam scheduled?
-        15. Do you participate in any group study sessions or discussions?
-        16. What is your motivation or reason for choosing your specific exam (e.g., career goals, personal interest)?
-        17. Do you have any particular challenges or obstacles in your preparation (e.g., time management, understanding complex concepts)?
+            'What is your name? ✍️',
+            'Which exam(s) are you preparing for (e.g., NEET, JEE, higher secondary exams)? 📚',
+            'How would you self-assess your proficiency level in physics (e.g., easy, medium, hard)? 🌟',
+            'How much time do you dedicate to studying physics each week? ⏰',
+            'Do you use any additional resources (e.g., coaching classes, online courses, textbooks) for your exam preparation? 📖',
+            'What are your strengths and weaknesses in specific physics topics (e.g., mechanics, thermodynamics, electromagnetism)? 💪💡',
+            'Do you prefer certain types of learning methods (e.g., visual aids, hands-on experiments, reading textbooks)? 🎥🔬📖',
+            'Do you have a study plan or schedule? 📅',
+            'What is your target score or rank for your upcoming exam? 🎯',
+            'What is your motivation or reason for choosing your specific exam (e.g., career goals, personal interest)? 💼🌟',
 
         Analyze the responses to these questions and generate the summary accordingly.
         rules:

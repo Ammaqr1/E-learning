@@ -20,7 +20,7 @@ class QuestionGenerator16:
 
         # Instruction to the system
         self.instruction_to_system = '''
-        Create a set of 16 questions and profile_ that directly assess a student's knowledge and understanding of fundamental physics concepts. 
+        Create a set of 10 questions and profile_ that directly assess a student's knowledge and understanding of fundamental physics concepts. 
         Ensure each question focuses on testing the student's grasp of essential theories, laws, and principles commonly covered in physics exams.
         These questions should be designed to evaluate conceptual understanding rather than study habits or exam preparation strategies.
         if the chat history is None generate a 16 question which is based on physics text book
