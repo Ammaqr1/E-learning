@@ -8,3 +8,4 @@ langchain-google-genai
 langchain-pinecone
 psycopg2-binary
 streamlit
+langchain-groq
