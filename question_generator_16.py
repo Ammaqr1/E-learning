@@ -20,10 +20,11 @@ class QuestionGenerator16:
 
         # Instruction to the system
         self.instruction_to_system = '''
-        Create a set of 10 questions and profile_ that directly assess a student's knowledge and understanding of fundamental physics concepts. 
-        Ensure each question focuses on testing the student's grasp of essential theories, laws, and principles commonly covered in physics exams.
+        Create a set of eight questions based on the profile_summary that directly assess a student's knowledge and understanding of fundamental physics concepts. 
+        Ensure each question focuses on testing the student's grasp of essential theories, laws, and principles commonly covered in ncert physics especially class 11 and 12 or related to jee,neet,cuet etc.
         These questions should be designed to evaluate conceptual understanding rather than study habits or exam preparation strategies.
-        if the chat history is None generate a 16 question which is based on physics text book
+        if the chat history is None generate a eight question which is based on physics text book,
+        Do not give quesiton not realted to physics also not related out of sylLabus
         '''
 
         # Creating the prompt template

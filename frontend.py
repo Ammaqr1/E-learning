@@ -26,16 +26,20 @@ def main_overview(user_id):
     return streak
 
 questions_intro = [
-    'What is your name? ✍️',
-    'Which exam(s) are you preparing for (e.g., NEET, JEE, higher secondary exams)? 📚',
-    'How would you self-assess your proficiency level in physics (e.g., easy, medium, hard)? 🌟',
-    'How much time do you dedicate to studying physics each week? ⏰',
-    'Do you use any additional resources (e.g., coaching classes, online courses, textbooks) for your exam preparation? 📖',
-    'What are your strengths and weaknesses in specific physics topics (e.g., mechanics, thermodynamics, electromagnetism)? 💪💡',
-    'Do you prefer certain types of learning methods (e.g., visual aids, hands-on experiments, reading textbooks)? 🎥🔬📖',
-    'Do you have a study plan or schedule? 📅',
-    'What is your target score or rank for your upcoming exam? 🎯',
-    'What is your motivation or reason for choosing your specific exam (e.g., career goals, personal interest)? 💼🌟',
+    "1). What is your name and which exam(s) are you preparing for (e.g., NEET, JEE, higher secondary exams)? ✍️📚",
+    "2). How would you self-assess your proficiency level in physics (easy, medium, hard) and how much time do you dedicate to studying physics each week? 🌟⏰",
+    "3). Do you use any additional resources (e.g., coaching classes, online courses, textbooks) and what types of learning methods do you prefer (e.g., visual aids, hands-on experiments, reading)? 📖🎥🔬",
+    "4). What are your strengths and weaknesses in specific physics topics (e.g., mechanics, thermodynamics, electromagnetism) and do you have a study plan or schedule? 💪💡📅",
+    "5). What is your target score or rank for your upcoming exam and what is your motivation or reason for choosing your specific exam (e.g., career goals, personal interest)? 🎯💼🌟"
+]
+
+placeholder = [
+    'My name is Ammar and I am preparing for the JEE exam.',
+    'My proficiency level is medium and I study physics for about 10 hours each week',
+    'I use coaching classes and prefer visual aids and online videos for learning',
+    'I am strong in mechanics but weak in electromagnetism, and I follow a weekly study plan',
+    'career goals, personal interest)? 🎯💼🌟 (e.g., My target score is 90% and I chose this exam because I want to pursue a career in engineering'
+    
 ]
 
 
@@ -112,7 +116,7 @@ if st.session_state.question_activation == 1:
         user_id = st.session_state.user_id
         q16 = QuestionGenerator16(user_id)
         additional_questions = q16.fetch_questions()
-        st.session_state.questions = additional_questions[2:18]
+        st.session_state.questions = additional_questions[2:10]
         st.session_state.question_activation += 1
 
 
@@ -318,7 +322,7 @@ elif st.session_state.page == 'evaluation':
         st.write(question)
         
         # Capture the answer and detect Enter key press
-        answer = st.text_input("Your answer", key=f'answer_{current_question}', on_change=lambda: st.session_state.update({f'answer_{current_question}_submitted': True}))
+        answer = st.text_input("Your answer", key=f'answer_{current_question}', on_change=lambda: st.session_state.update({f'answer_{current_question}_submitted': True}),placeholder=placeholder[current_question])
 
         if st.session_state.get(f'answer_{current_question}_submitted', False):
             db.save_message(user_id, f"profile_evaluation_{user_id}", "user", answer)
@@ -329,7 +333,7 @@ elif st.session_state.page == 'evaluation':
             st.rerun()
         
     else:
-        st.write("You have completed all the questions. Thank you! Now you will be redirected to another page.")
+        st.write("You have completed all the questions. Thank you! Ready for a small assessment.")
         st.session_state.question_activation += 1
         navigate('more')
         st.session_state.current_question = 0
@@ -338,7 +342,7 @@ elif st.session_state.page == 'evaluation':
 
 # More Page
 elif st.session_state.page == 'more':
-    st.title("More Page")
+    st.title("ASSESMENT")
     user_id = st.session_state.user_id
     if not user_id or not user_exists(user_id):
         st.write("Access denied. Please sign up as a new user to access this page.")
@@ -409,11 +413,13 @@ elif st.session_state.page == 'dashboard':
         navigate('Doubt_clearance')
         st.rerun()
         
-    if st.button('📝 Start Exam', key='exam'):
+        
+        
+    if st.button('🎓 Start Exam', key='exam'):
         navigate('exam')
         user_id = st.session_state.user_id  
         st.session_state.question_paper = []    
-        with st.spinner('Generating questions...'): 
+        with st.spinner('Generating your questions...This may take upto 10 sec...'): 
             exam = Exam(user_id)
             questions = exam.get_question_paper()           
         st.session_state.question_paper.extend(questions)
@@ -430,6 +436,10 @@ elif st.session_state.page == 'dashboard':
         navigate('solve_x')
         st.rerun()
         
+    if st.button('🔗 Explore Communities',key= 'explore_communities'):
+        navigate('community')
+        st.rerun()
+        
     if st.button('🔓 Log Out', key='log_out'):
         navigate('welcome')
         st.rerun()
@@ -442,6 +452,7 @@ elif st.session_state.page == 'dashboard':
 elif st.session_state.page == 'Overview':
     if st.button('back', key='student_analysis_back'):
         navigate('dashboard')    
+        st.rerun()
     user_id = st.session_state.user_id
     streak = main_overview(user_id)
     st.session_state.streak = streak      
@@ -482,7 +493,7 @@ elif st.session_state.page == 'study':
     
     st.title("Select a Chapter")
     for i in range(1, 16):
-        if st.button(f"Chapter {i}", key=f'chapter_{i}_button'):
+        if st.button(f"Chapter {i} ♧", key=f'chapter_{i}_button'):
             st.session_state.page = f'chapter_{i}'
             st.rerun()
 
@@ -506,7 +517,7 @@ elif st.session_state.page == 'test':
         st.rerun()     
     st.title("Select a Chapter for Assessment")
     for i in range(1, 16):
-        if st.button(f"Chapter {i} Assessment", key=f'chapter_test_{i}_button'):
+        if st.button(f"Chapter {i} Assessment 🎓", key=f'chapter_test_{i}_button'):
             st.session_state.page = f'test_lesson_wise_{i}'
             st.rerun()
 
@@ -699,7 +710,7 @@ elif st.session_state.page == 'summary':
         st.rerun()
     
     for i in range(1, 16):
-        if st.button(f"Chapter_{i}_summary", key=f'chapter_summary_{i}_button'):
+        if st.button(f"Chapter_{i}_summary 📑", key=f'chapter_summary_{i}_button'):
             st.session_state.page = f'summary_chapter_{i}'
             st.rerun()
    
@@ -782,7 +793,7 @@ elif st.session_state.page == 'exam':
 
     # Display the timer
     st.sidebar.title("Timer")
-    st.sidebar.write(f"Time remaining: {int(max(0, remaining_time))} seconds")
+    st.sidebar.write(f"Time remaining: {int(max(0, remaining_time/60))} minutes")
 
     # Check if time is up
     if remaining_time <= 0:
@@ -858,14 +869,27 @@ elif st.session_state.page == 'exam_score':
         navigate('exam')
         st.rerun()
     st.title('Your Score')
-    exam_question_and_answer = st.session_state.exam_question_and_answers
-    print('this is exam quesiton and answer',exam_question_and_answer)
-    
-    
+    exam_question_and_answer = st.session_state.exam_question_and_answers    
     exams_score = Exam_Score(exam_question_and_answer)
     with st.spinner('Getting your answer this may take a while'):
         score = exams_score.get_score()
     st.write(score)
     
+    
+elif st.session_state.page == 'community':
+    if st.button('Back',key='community_back_button'):
+        navigate('dashboard')
+        st.rerun()
+    st.title("Welcome to the Physics Competitive Exam Community Hub!")
+    st.markdown(
+        "🌟 Join our community to explore various resources and discussions on physics, JEE, and NEET preparation: Click below Telegram channel button"
+    )
+    
+    st.markdown("- [Telegram Group 🤖](https://t.me/physics_fysics)")
+    st.markdown("- [Reddit r/JEENEETards](https://www.reddit.com/r/JEENEETards/) : A subreddit dedicated to JEE and NEET preparation where students discuss various topics, share resources, and solve doubts.")
+    st.markdown("- [Physics Stack Exchange](https://physics.stackexchange.com/) : A general physics Q&A site with many high-level questions beneficial for advanced students.")
+    st.markdown("- [Math Stack Exchange](https://math.stackexchange.com/) : Useful for solving complex math problems related to physics topics.")
+    
+    st.markdown("More community links will be added soon! 🚀")
         
     

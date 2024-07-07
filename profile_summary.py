@@ -22,16 +22,11 @@ class Profile_summary:
         Weaknesses: 
         Solutions: 
 
-            'What is your name? ✍️',
-            'Which exam(s) are you preparing for (e.g., NEET, JEE, higher secondary exams)? 📚',
-            'How would you self-assess your proficiency level in physics (e.g., easy, medium, hard)? 🌟',
-            'How much time do you dedicate to studying physics each week? ⏰',
-            'Do you use any additional resources (e.g., coaching classes, online courses, textbooks) for your exam preparation? 📖',
-            'What are your strengths and weaknesses in specific physics topics (e.g., mechanics, thermodynamics, electromagnetism)? 💪💡',
-            'Do you prefer certain types of learning methods (e.g., visual aids, hands-on experiments, reading textbooks)? 🎥🔬📖',
-            'Do you have a study plan or schedule? 📅',
-            'What is your target score or rank for your upcoming exam? 🎯',
-            'What is your motivation or reason for choosing your specific exam (e.g., career goals, personal interest)? 💼🌟',
+        "1). What is your name and which exam(s) are you preparing for (e.g., NEET, JEE, higher secondary exams)? ✍️📚",
+        "2). How would you self-assess your proficiency level in physics (easy, medium, hard) and how much time do you dedicate to studying physics each week? 🌟⏰",
+        "3). Do you use any additional resources (e.g., coaching classes, online courses, textbooks) and what types of learning methods do you prefer (e.g., visual aids, hands-on experiments, reading)? 📖🎥🔬",
+        "4). What are your strengths and weaknesses in specific physics topics (e.g., mechanics, thermodynamics, electromagnetism) and do you have a study plan or schedule? 💪💡📅",
+        "5). What is your target score or rank for your upcoming exam and what is your motivation or reason for choosing your specific exam (e.g., career goals, personal interest)? 🎯💼🌟"
 
         Analyze the responses to these questions and generate the summary accordingly.
         rules:
