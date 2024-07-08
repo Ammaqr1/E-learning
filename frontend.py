@@ -16,6 +16,8 @@ from datetime import datetime
 import os
 from Exam import Exam
 from exam_score import Exam_Score
+import google.generativeai as genai
+from solve_Y import SolveY
 
 
 def main_overview(user_id):
@@ -436,6 +438,10 @@ elif st.session_state.page == 'dashboard':
         navigate('solve_x')
         st.rerun()
         
+    if st.button('🔍 Get Explanation on Vidoes', key='solve_y'):
+        navigate('solve_y')
+        st.rerun()
+        
     if st.button('🔗 Explore Communities',key= 'explore_communities'):
         navigate('community')
         st.rerun()
@@ -480,6 +486,38 @@ elif st.session_state.page == 'solve_x':
     
     if submit:
         response = app.get_gemini_response(input_text, image)
+        st.subheader("The Response is")
+        st.write(response)
+        
+elif st.session_state.page == 'solve_y':
+    if st.button('Back',key='video_back'):
+        navigate('dashboard')
+        st.rerun()
+    st.title('Get an Explanation on video')
+    app = SolveY()
+
+    st.header("Solve Your Problem Using an Uploaded Video")
+    input_text = st.text_input("Input Prompt: ", key="input")
+    uploaded_file = st.file_uploader("Choose a video...", type=["mp4", "mpeg", "avi", "mov", "x-flv", "mpg", "webm", "wmv", "3gpp"])
+
+    save_directory = 'physics_related_videos'
+    os.makedirs(save_directory, exist_ok=True)
+
+    if uploaded_file is not None:
+        save_path = os.path.join(save_directory, uploaded_file.name)
+        with open(save_path, "wb") as f:
+            f.write(uploaded_file.getbuffer())
+
+        st.video(save_path)
+
+        video_file = genai.upload_file(path=save_path)
+    else:
+        st.write('Please upload a video file to proceed.')
+
+    submit = st.button("Start Solving")
+
+    if submit and uploaded_file:
+        response = app.get_gemini_response(input_text, video_file)
         st.subheader("The Response is")
         st.write(response)
 
